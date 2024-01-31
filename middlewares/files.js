@@ -5,6 +5,14 @@ const uploadFiles = (req,res,next) =>{
         {
             name:'avatar',
             maxCount:1
+        },
+        {
+            name : 'cover',
+            maxCount : 1
+        },
+        {
+            name : 'thumbnail',
+            maxCount : 1
         }
     ])(req,res, (err) =>{
         if(err){

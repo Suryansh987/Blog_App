@@ -3,32 +3,61 @@ import uploadFiles from "../middlewares/files.js";
 import hashPass from "../middlewares/hashPass.js";
 import { user } from "../db/models/userSchema.js";
 import {uploadAvatarImage, uploadCoverImage} from "../cloudStore/cloudUpload.js";
+import createJWT from "../controller/jwt.controller.js";
+import verifyPass from "../controller/pass.controller.js";
 
 const router = Router()
 
+//ROUTE : FOR USER SIGNUP with NAME, EMAIL, PASS, AVATAR,COVERIMAGE(POST)
 router.post('/signup', uploadFiles, hashPass, async (req, res) => {
     if (res.headersSent) return
     const { email, name, password } = req.body
     if([email,name,password].some((value)=>{
-        return value?.trim()===""
+        return value?.trim()==="" || value?.trim() === undefined 
     })){
         return res.status(400).json({"error":"All feilds are Required"})
     }
-    const {avatar,cover} = req.files
+    const {avatar, cover} = req.files
     let avatar_url,cover_url
     if(avatar){
-        avatar_url = await uploadAvatarImage(avatar.path)
+        avatar_url = await uploadAvatarImage(avatar[0].path)
     }
     if(cover){
-        cover_url = await uploadCoverImage(cover.path)
+        cover_url = await uploadCoverImage(cover[0].path)
     }
     try {
-        const newUser = await user.create({ name, email, password, avataravatar_url_url, cover_url })
-        res.status(200).send(newUser)    
+        const newUser = await user.create({ name, email, password, 'profilePic':avatar_url, "coverImage":cover_url })
+        const token = createJWT(newUser)
+        res
+    .status(200)
+    .cookie('token', `Bearer ${token}`,{
+        httpOnly : true,
+        secure : true
+    })
+    .send("Signedin Successfully")    
     } catch (err) {
-        return res.status(409).send(err)
+        return res.status(409).json({"error":err.message})
     }
-    res.send("hello")
+})
+
+//ROUTE : FOR USER LOGIN WITH EMAIL AND PASS(POST)
+router.post('/login',async(req,res)=>{
+    const {email,password} = req.body
+    if(!(email&&password)){ return res.status(400).json({"error":"Email and password are required"}) }
+    const userData = await user.findOne({email})
+    if(!userData){ return res.status(400).json({"error":"Please create a account first"}) }
+    const result = await verifyPass(password, userData.password)
+    if(!result){
+        res.status(401).json({"error":"Invalid Credentials"})
+    }
+    const token = createJWT(userData)
+    res
+    .status(200)
+    .cookie('token', `Bearer ${token}`,{
+        httpOnly : true,
+        secure : true
+    })
+    .send("Logged in Successfully")
 })
 
 export default router

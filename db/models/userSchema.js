@@ -9,15 +9,22 @@ const UserSchema = new Schema({
     },
     email : {
         type : String,
-        required : true
+        unique : true,
+        required : true,
+        lowercase : true
     },
     password : {
         type : String,
         required : true
     },
-    ProfilePic :{
+    profilePic :{
         type : String,
-        
+        lowercase : true,
+        default : "https://res.cloudinary.com/dybwlpu9u/image/upload/v1706519441/Avatar/h2w4cdnhxo5opzpnyydq.png"
+    },
+    coverImage :{
+        type : String,
+        default : "https://res.cloudinary.com/dybwlpu9u/image/upload/v1706715946/Cover/mdrxyr6nuzx4t1vepio4.jpg"
     }
 },{timestamps:true})
 

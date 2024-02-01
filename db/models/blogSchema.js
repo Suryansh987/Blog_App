@@ -1,6 +1,6 @@
 import mongoose,{ Schema } from "mongoose";
 import { db_name } from "../../conf/conf.js";
-const db = mongoose.connection.useDb('db_name')
+const db = mongoose.connection.useDb(db_name)
 const blogSchema = new Schema({
     title : {
         type : String,

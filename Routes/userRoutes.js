@@ -5,18 +5,14 @@ import { user } from "../db/models/userSchema.js";
 import {uploadAvatarImage, uploadCoverImage} from "../cloudStore/cloudUpload.js";
 import createJWT from "../controller/jwt.controller.js";
 import verifyPass from "../controller/pass.controller.js";
+import {validateRegisterData, validateLoginData} from "../middlewares/validate.js";
 
 const router = Router()
 
 //ROUTE : FOR USER SIGNUP with NAME, EMAIL, PASS, AVATAR,COVERIMAGE(POST)
-router.post('/signup', uploadFiles, hashPass, async (req, res) => {
+router.post('/signup', uploadFiles, validateRegisterData, hashPass, async (req, res) => {
     if (res.headersSent) return
-    const { email, name, password } = req.body
-    if([email,name,password].some((value)=>{
-        return value?.trim()==="" || value?.trim() === undefined 
-    })){
-        return res.status(400).json({"error":"All feilds are Required"})
-    }
+    const { email, name, password } = req.body 
     const {avatar, cover} = req.files
     let avatar_url,cover_url
     if(avatar){
@@ -41,9 +37,8 @@ router.post('/signup', uploadFiles, hashPass, async (req, res) => {
 })
 
 //ROUTE : FOR USER LOGIN WITH EMAIL AND PASS(POST)
-router.post('/login',async(req,res)=>{
+router.post('/login', validateLoginData, async(req,res)=>{
     const {email,password} = req.body
-    if(!(email&&password)){ return res.status(400).json({"error":"Email and password are required"}) }
     const userData = await user.findOne({email})
     if(!userData){ return res.status(400).json({"error":"Please create a account first"}) }
     const result = await verifyPass(password, userData.password)

@@ -2,27 +2,20 @@ import { Router } from "express";
 import uploadFiles from "../middlewares/files.js";
 import hashPass from "../middlewares/hashPass.js";
 import { user } from "../db/models/userSchema.js";
-import {uploadAvatarImage, uploadCoverImage} from "../cloudStore/cloudUpload.js";
+import {deleteAvatarImage, uploadAvatarImage, uploadCoverImage} from "../cloudStore/cloudUpload.js";
 import createJWT from "../controller/jwt.controller.js";
 import verifyPass from "../controller/pass.controller.js";
 import {validateRegisterData, validateLoginData} from "../middlewares/validate.js";
+import fetchUser from "../middlewares/fetchUser.js";
 
 const router = Router()
 
 //ROUTE : FOR USER SIGNUP with NAME, EMAIL, PASS, AVATAR,COVERIMAGE(POST)
-router.post('/signup', uploadFiles, validateRegisterData, hashPass, async (req, res) => {
+router.post('/signup', validateRegisterData, hashPass, async (req, res) => {
     if (res.headersSent) return
     const { email, name, password } = req.body 
-    const {avatar, cover} = req.files
-    let avatar_url,cover_url
-    if(avatar){
-        avatar_url = await uploadAvatarImage(avatar[0].path)
-    }
-    if(cover){
-        cover_url = await uploadCoverImage(cover[0].path)
-    }
     try {
-        const newUser = await user.create({ name, email, password, 'profilePic':avatar_url, "coverImage":cover_url })
+        const newUser = await user.create({ name, email, password })
         const token = createJWT(newUser)
         res
     .status(200)
@@ -53,6 +46,20 @@ router.post('/login', validateLoginData, async(req,res)=>{
         secure : true
     })
     .send("Logged in Successfully")
+})
+
+router.use('/updateavatar' , uploadFiles, fetchUser, async(req,res)=>{
+    if(res.headersSent) return 
+    const avatar = req.files?.avatar
+    if(!avatar){
+        return res.status(400).json({error:"Avatar is Required"})
+    }
+    const avatar_path = avatar[0].path
+    uploadAvatarImage(avatar_path)
+    .then(data=>console.log(data))
+    deleteAvatarImage(avatar_id)
+    .then(data=>console.log(data))
+    res.status(200).send("Done")
 })
 
 export default router

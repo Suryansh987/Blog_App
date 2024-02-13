@@ -18,10 +18,14 @@ const blogSchema = new Schema({
     thumbnail : {
         type : String,
     },
+    thumbnail_id : {
+        type : String,
+    },
     user : {
         type : Schema.Types.ObjectId,
         ref : "user",
-        required : true
+        required : true,
+        index : true
     }
 },{timestamps : true})
 

@@ -17,15 +17,20 @@ const UserSchema = new Schema({
         type : String,
         required : true
     },
-    profilePic :{
+    avatar :{
         type : String,
         lowercase : true,
-        default : "https://res.cloudinary.com/dybwlpu9u/image/upload/v1706519441/Avatar/h2w4cdnhxo5opzpnyydq.png"
     },
-    coverImage :{
+    avatar_id : {
         type : String,
-        default : "https://res.cloudinary.com/dybwlpu9u/image/upload/v1706715946/Cover/mdrxyr6nuzx4t1vepio4.jpg"
+    },
+    coverImage : {
+        type : String,
+    },
+    cover_id : {
+        type : String,
     }
+
 },{timestamps:true})
 
 export const user = db.model("User",UserSchema,"Users")

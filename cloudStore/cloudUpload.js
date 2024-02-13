@@ -5,6 +5,8 @@ cloudinary.config({
     api_key: cloud_api,
     api_secret: api_secret
 });
+
+
 import fs from 'fs'
 
 const unlinkFile = (filePath) => {
@@ -50,6 +52,7 @@ const uploadThumbnailImage = async (imagePath) => {
             resource_type: 'image'
         })
         unlinkFile(imagePath)
+        console.log(thumbnailData);
         return thumbnailData.secure_url
     } catch (error) {
         unlinkFile(imagePath)
@@ -57,4 +60,15 @@ const uploadThumbnailImage = async (imagePath) => {
     }
 }
 
-export { uploadAvatarImage, uploadCoverImage, uploadThumbnailImage }
+const deleteAvatarImage = (public_id) => {
+    try {
+        cloudinary.api.delete_resources([public_id], 
+        { type: 'upload', resource_type: 'image' })
+        .then(data=>{ console.log(data);} );
+    } catch (error) {
+        return res.status(400).json({error:error.message})
+    }
+}
+
+
+export { uploadAvatarImage, uploadCoverImage, uploadThumbnailImage, deleteAvatarImage }

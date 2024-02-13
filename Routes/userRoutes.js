@@ -48,18 +48,41 @@ router.post('/login', validateLoginData, async(req,res)=>{
     .send("Logged in Successfully")
 })
 
-router.use('/updateavatar' , uploadFiles, fetchUser, async(req,res)=>{
-    if(res.headersSent) return 
-    const avatar = req.files?.avatar
-    if(!avatar){
-        return res.status(400).json({error:"Avatar is Required"})
+router.use('/updateavatar', uploadFiles, fetchUser, async (req, res) => {
+    if (res.headersSent) return;
+    const id = req.user._id;
+    const avatar = req.files?.avatar;
+    const user_data = await user.findOne({ _id: id });
+
+    if (!avatar) {
+        return res.status(400).json({ error: "Avatar is Required" });
     }
-    const avatar_path = avatar[0].path
-    uploadAvatarImage(avatar_path)
-    .then(data=>console.log(data))
-    deleteAvatarImage(avatar_id)
-    .then(data=>console.log(data))
-    res.status(200).send("Done")
-})
+
+    const avatar_path = avatar[0].path;
+
+    // Start both operations concurrently
+    const [uploadPromise, deletePromise] = [
+        uploadAvatarImage(avatar_path),
+        user_data.avatar_id ? deleteAvatarImage(user_data.avatar_id) : Promise.resolve(null)
+    ];
+
+    try {
+        // Wait for both promises to resolve
+        const [upload_data, delete_status] = await Promise.all([uploadPromise, deletePromise]);
+
+        // Update user data with new avatar information
+        const { avatar_url, avatar_id } = upload_data;
+        user_data.avatar_url = avatar_url;
+        user_data.avatar_id = avatar_id;
+        await user_data.save({ validateBeforeSave: false });
+
+        // Send response after both processes are completed
+        res.json({upload_data,delete_status});
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
+
 
 export default router

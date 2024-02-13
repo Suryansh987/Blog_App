@@ -17,14 +17,14 @@ const UserSchema = new Schema({
         type : String,
         required : true
     },
-    avatar :{
+    avatar_url :{
         type : String,
         lowercase : true,
     },
     avatar_id : {
         type : String,
     },
-    coverImage : {
+    cover_url : {
         type : String,
     },
     cover_id : {

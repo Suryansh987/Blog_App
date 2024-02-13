@@ -24,7 +24,7 @@ const uploadAvatarImage = async (imagePath) => {
             resource_type: 'image'
         })
         unlinkFile(imagePath)
-        return avatarData.secure_url
+        return { avatar_url:avatarData.secure_url, avatar_id:avatarData.public_id}
     } catch (error) {
         unlinkFile(imagePath)
         return new Error(error.message)
@@ -38,7 +38,7 @@ const uploadCoverImage = async (imagePath) => {
             resource_type: 'image'
         })
         unlinkFile(imagePath)
-        return coverData.secure_url
+        return { cover_url:coverData.secure_url, cover_id:coverData.public_id}
     } catch (error) {
         unlinkFile(imagePath)
         return new Error(error.message)
@@ -52,19 +52,19 @@ const uploadThumbnailImage = async (imagePath) => {
             resource_type: 'image'
         })
         unlinkFile(imagePath)
-        console.log(thumbnailData);
-        return thumbnailData.secure_url
+        return { thumbnail_url:thumbnailData.secure_url, thumbnail_id:thumbnailData.public_id}
     } catch (error) {
         unlinkFile(imagePath)
         return new Error(error.message)
     }
 }
 
-const deleteAvatarImage = (public_id) => {
+const deleteAvatarImage = async(public_id) => {
     try {
-        cloudinary.api.delete_resources([public_id], 
+        const delete_status = await cloudinary.api.delete_resources([public_id], 
         { type: 'upload', resource_type: 'image' })
-        .then(data=>{ console.log(data);} );
+        console.log(delete_status);
+        return delete_status
     } catch (error) {
         return res.status(400).json({error:error.message})
     }

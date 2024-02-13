@@ -11,8 +11,9 @@ router.get('/addblog', fetchUser , uploadFiles , validateBlogData , async(req,re
     const user = req.user._id
     const { title, description, tag } = req.body
     const thumbnail_path = req.files.thumbnail[0].path
-    const thumbnail_url = await uploadThumbnailImage(thumbnail_path)
-    const newblog = await blog.create({title , description , tag , "thumbnail": thumbnail_url , user})
+    const thumbnail_data = await uploadThumbnailImage(thumbnail_path)
+    const { thumbnail_url, thumbnail_id } = thumbnail_data 
+    const newblog = await blog.create({title , description , tag , thumbnail_url , thumbnail_id , user})
     res.send(newblog)
 })
 

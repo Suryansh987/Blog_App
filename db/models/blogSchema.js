@@ -15,7 +15,7 @@ const blogSchema = new Schema({
         default : "General",
         lowercase : true
     },
-    thumbnail : {
+    thumbnail_url : {
         type : String,
     },
     thumbnail_id : {

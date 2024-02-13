@@ -2,12 +2,12 @@ import { Router } from 'express'
 import { blog } from '../db/models/blogSchema.js'
 import fetchUser from '../middlewares/fetchUser.js'
 import uploadFiles from '../middlewares/files.js'
-import {  uploadThumbnailImage } from '../cloudStore/cloudUpload.js'
+import {  deleteImage, uploadThumbnailImage } from '../cloudStore/cloudUpload.js'
 import { validateBlogData } from '../middlewares/validate.js'
 
 const router = Router()
 
-router.get('/addblog', fetchUser , uploadFiles , validateBlogData , async(req,res)=>{
+router.post('/addblog', fetchUser , uploadFiles , validateBlogData , async(req,res)=>{
     const user = req.user._id
     const { title, description, tag } = req.body
     const thumbnail_path = req.files.thumbnail[0].path
@@ -25,6 +25,46 @@ router.get('/fetch', fetchUser , async(req,res)=>{
     } catch (error) {
         return res.status(500).json({"error":error.message})
     }
+})
+
+router.post('/updatethumbnail/:id', fetchUser, uploadFiles, async(req,res)=>{
+
+    if(res.headersSent) return
+
+    const thumbnail = req.files?.thumbnail
+    if(!thumbnail){
+        res.status(400).json({error:"thumbnail Image is mandatory"})
+    }
+
+    const id = req.params.id
+
+    const thumbnail_path = thumbnail[0].path
+    const blog_data = await blog.findById(id)
+
+    if(!blog_data) return res.status(409).json({error:"Not a valid User"})
+
+        // Start both operations concurrently
+        const [uploadPromise, deletePromise] = [
+            uploadThumbnailImage(thumbnail_path),
+            blog_data.thumbnail_id ? deleteImage(blog_data.thumbnail_id) : Promise.resolve(null)
+        ];
+    
+        try {
+            // Wait for both promises to resolve
+            const [upload_data, delete_status] = await Promise.all([uploadPromise, deletePromise]);
+    
+            // Update user data with new avatar information
+            const { thumbnail_url, thumbnail_id } = upload_data;
+            blog_data.thumbnail_url = thumbnail_url;
+            blog_data.thumbnail_id = thumbnail_id;
+            await blog_data.save({ validateBeforeSave: false });
+    
+            // Send response after both processes are completed
+            res.json({upload_data,delete_status});
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: "Internal Server Error" });
+        }
 })
 
 

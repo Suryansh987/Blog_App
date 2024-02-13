@@ -59,7 +59,7 @@ const uploadThumbnailImage = async (imagePath) => {
     }
 }
 
-const deleteAvatarImage = async(public_id) => {
+const deleteImage = async(public_id) => {
     try {
         const delete_status = await cloudinary.api.delete_resources([public_id], 
         { type: 'upload', resource_type: 'image' })
@@ -71,4 +71,4 @@ const deleteAvatarImage = async(public_id) => {
 }
 
 
-export { uploadAvatarImage, uploadCoverImage, uploadThumbnailImage, deleteAvatarImage }
+export { uploadAvatarImage, uploadCoverImage, uploadThumbnailImage, deleteImage }

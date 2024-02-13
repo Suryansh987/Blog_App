@@ -4,21 +4,21 @@ const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$
 const validateRegisterData = [
     body('name')
     .escape()
-    .exists().withMessage("Name is Required")
+    .exists()
     .isLength({min:2}).withMessage("Name should contain at least 2 letters")
     .custom(value=>{
         const lowValue = value.toLowerCase()
         if(invalidNames.includes(lowValue)){
-            throw new Error("Invalid Name")
+            throw new Error("Invalid Name") 
         }
         return true;
     }),
     body('email')
-    .exists().withMessage("Email is Required")
+    .exists()
     .isEmail().withMessage("Invalid Email"),
     body('password')
-    .exists().withMessage("Password is Required")
-    .isLength({min:8}).withMessage("Password should contain 8 letters")
+    .exists()
+    .isLength({min:8})
     .matches(passwordRegex).withMessage("Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, one digit, and one special character"),
     (req,res,next) => {
         const errors = validationResult(req)
@@ -32,11 +32,11 @@ const validateRegisterData = [
 const validateLoginData = [
     body('email')
     .escape()
-    .exists().withMessage("Email is Required")
+    .exists()
     .isEmail().withMessage("Invalid Email"),
     body('password')
-    .exists().withMessage("Password is Required")
-    .isLength({min:8}).withMessage("Password should contain at least 8 Characters")
+    .exists()
+    .isLength({min:8})
     .matches(passwordRegex).withMessage("Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, one digit, and one special character"),
     (req,res,next)=>{
         const errors = validationResult(req)

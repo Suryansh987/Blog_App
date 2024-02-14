@@ -58,9 +58,8 @@ router.post('/login', validateLoginData, async(req,res)=>{
     .send("Logged in Successfully")
 })
 
-
+//ROUTE: UPDATE USER DATA
 router.put('/updateUser', fetchUser, uploadFiles, async(req,res)=>{
-
    try {
      if(res.headersSent) return 
  

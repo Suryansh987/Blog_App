@@ -58,86 +58,64 @@ router.post('/login', validateLoginData, async(req,res)=>{
     .send("Logged in Successfully")
 })
 
-router.post('/updateavatar', uploadFiles, fetchUser, async (req, res) => {
 
-    if (res.headersSent) return;
+router.put('/updateUser', fetchUser, uploadFiles, async(req,res)=>{
 
-    const id = req.user._id;
-    const avatar = req.files?.avatar;
-    
-    
-    if (!avatar) {
-        return res.status(400).json({ error: "Avatar is Required" });
-    }
-    
-    const avatar_path = avatar[0].path;
+   try {
+     if(res.headersSent) return 
+ 
+     const id = req.user._id
+     const user_data = await user.findById(id)
+     if(!user_data) return res.status(409).json({error:"User not Found"})
+ 
+     const { name } = req.body
+ 
+     if( user_data.name!==name ){
+         user_data.name = name
+     }
+     else{
+        console.log("notChanged");
+     }
+ 
+     const avatar = req?.files?.avatar
+     const cover = req?.files?.cover
+     
+     let avatar_path,cover_path
+     if(avatar){
+         avatar_path = avatar[0].path
+     }
+     if(cover){
+         cover_path = cover[0].path
+     }
+ 
+     const [ avatarPromise, coverPromise, avatarDelete, coverDelete] = [
+         avatar_path?uploadAvatarImage(avatar_path):Promise.resolve(null),
+         cover_path?uploadCoverImage(cover_path):Promise.resolve(null),
+         avatar_path?user_data.avatar_id ? deleteImage(user_data.avatar_id):Promise.resolve(null):Promise.resolve(null),
+         cover_path?user_data.cover_id ? deleteImage(user_data.cover_id):Promise.resolve(null):Promise.resolve(null)
+     ]
+ 
+     const [ avatar_data, cover_data, avatar_del_status, cover_del_status ] = await Promise.all([ avatarPromise, coverPromise, avatarDelete, coverDelete ])
+     console.log(avatar_data, cover_data, avatar_del_status, cover_del_status);
+     if(avatar_data){
+             const { avatar_url,avatar_id } = avatar_data
+             user_data.avatar_url = avatar_url
+             user_data.avatar_id = avatar_id
+     }
+     if(cover_data){
+         const { cover_url,cover_id } = cover_data
+         user_data.cover_url = cover_url
+         user_data.cover_id = cover_id
+     }
+     user_data.save({validateBeforeSave:false})
+     res.send(user_data)
+   } catch (error) {
+        res.status(500).json({error:error.message})
+   }
 
-    const user_data = await user.findById(id);
-    if(!user_data) return res.status(409).json({error:"Not a Valid User"})
-
-    // Start both operations concurrently
-    const [uploadPromise, deletePromise] = [
-        uploadAvatarImage(avatar_path),
-        user_data.avatar_id ? deleteImage(user_data.avatar_id) : Promise.resolve(null)
-    ];
-
-    try {
-        // Wait for both promises to resolve
-        const [upload_data, delete_status] = await Promise.all([uploadPromise, deletePromise]);
-
-        // Update user data with new avatar information
-        const { avatar_url, avatar_id } = upload_data;
-        user_data.avatar_url = avatar_url;
-        user_data.avatar_id = avatar_id;
-        await user_data.save({ validateBeforeSave: false });
-
-        // Send response after both processes are completed
-        res.json({upload_data,delete_status});
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-});
-
-router.post('/updateCover' , fetchUser, uploadFiles, async(req,res)=>{
-
-    if(res.headersSent) return
-    const cover = req.files?.cover
-    if(!cover){
-        res.status(400).json({error:"Cover Image is mandatory"})
-    }
-
-    const cover_path = cover[0].path
-    const id = req.user._id
-    const user_data = await user.findById(id)
-
-    if(!user_data) return res.status(409).json({error:"Not a valid User"})
-
-        // Start both operations concurrently
-        const [uploadPromise, deletePromise] = [
-            uploadCoverImage(cover_path),
-            user_data.cover_id ? deleteImage(user_data.cover_id) : Promise.resolve(null)
-        ];
-    
-        try {
-            // Wait for both promises to resolve
-            const [upload_data, delete_status] = await Promise.all([uploadPromise, deletePromise]);
-    
-            // Update user data with new avatar information
-            const { cover_url, cover_id } = upload_data;
-            user_data.cover_url = cover_url;
-            user_data.cover_id = cover_id;
-            await user_data.save({ validateBeforeSave: false });
-    
-            // Send response after both processes are completed
-            res.json({upload_data,delete_status});
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ error: "Internal Server Error" });
-        }
-
+   
     
 
-}) 
+})
 
 export default router

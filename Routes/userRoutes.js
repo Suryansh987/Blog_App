@@ -55,7 +55,7 @@ router.post('/login', validateLoginData, async(req,res)=>{
         httpOnly : true,
         secure : true
     })
-    .send("Logged in Successfully")
+    .json({sucess:"Logged in Successfully"})
 })
 
 //ROUTE: UPDATE USER DATA

@@ -23,7 +23,13 @@ const validateRegisterData = [
     (req,res,next) => {
         const errors = validationResult(req)
         if(!errors.isEmpty()){
-            return res.status(400).json({"error":errors.array() })
+            const regErrors=errors.array()
+            const error = regErrors.reduce((error,value)=>{
+                console.log(value.path);
+                error[value.path] = value.msg
+                return error
+            },{})
+            return res.status(400).json({error})
         }
         next()
     }
@@ -41,7 +47,13 @@ const validateLoginData = [
     (req,res,next)=>{
         const errors = validationResult(req)
         if(!errors.isEmpty()){
-            return res.status(409).json({"error":errors.array()})
+            const loginErrors=errors.array()
+            const error = loginErrors.reduce((error,value)=>{
+                console.log(value.path);
+                error[value.path] = value.msg
+                return error
+            },{})
+            return res.status(400).json({error})
         }
         next()
     }
@@ -56,7 +68,13 @@ const validateBlogData = [
     (req,res,next)=>{
         const errors = validationResult(req)
         if(!errors.isEmpty()){
-            return res.status(409).json({"error":errors.array()})
+            const blogErrors=errors.array()
+            const error = blogErrors.reduce((error,value)=>{
+                console.log(value.path);
+                error[value.path] = value.msg
+                return error
+            },{})
+            return res.status(400).json({error})
         }
         if(!req.files?.thumbnail){
             return res.status(409).json({"error":"Thumbnail is Required"})

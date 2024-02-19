@@ -26,7 +26,7 @@ router.post('/signup', validateRegisterData, hashPass, async (req, res) => {
         httpOnly : true,
         secure : true
     })
-    .send("Signedin Successfully")    
+    .json(newUser)  
     } catch (err) {
         return res.status(409).json({"error":err.message})
     }
@@ -51,11 +51,14 @@ router.post('/login', validateLoginData, async(req,res)=>{
 
     res
     .status(200)
-    .cookie('token', `Bearer ${token}`,{
-        httpOnly : true,
-        secure : true
+    .cookie('token', `Bearer ${token}`)
+    .json({user:{
+        name: userData.name,
+        email: userData.email,
+        avatar_url: userData?.avatar_url,
+        cover_url: userData?.cover_url
+    }
     })
-    .json({sucess:"Logged in Successfully"})
 })
 
 //ROUTE: UPDATE USER DATA
@@ -107,14 +110,12 @@ router.put('/updateUser', fetchUser, uploadFiles, async(req,res)=>{
          user_data.cover_id = cover_id
      }
      user_data.save({validateBeforeSave:false})
-     res.send(user_data)
+     res.status(200).json(user_data)
    } catch (error) {
         res.status(500).json({error:error.message})
    }
 
-   
-    
-
 })
+
 
 export default router

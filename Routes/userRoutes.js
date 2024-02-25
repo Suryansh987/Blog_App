@@ -11,22 +11,29 @@ import fetchUser from "../middlewares/fetchUser.js";
 const router = Router()
 
 //ROUTE : FOR USER SIGNUP with NAME, EMAIL, PASS, AVATAR,COVERIMAGE(POST)
-router.post('/signup', validateRegisterData, hashPass, async (req, res) => {
+router.post('/signin', validateRegisterData, hashPass, async (req, res) => {
 
     if (res.headersSent) return
 
     const { email, name, password } = req.body 
+    const isUser = await user.findOne({email:email})
+    if(isUser){
+        return res.status(400).json({"error":"User already exixts"})
+    }
     
     try {
         const newUser = await user.create({ name, email, password })
         const token = createJWT(newUser)
         res
     .status(200)
-    .cookie('token', `Bearer ${token}`,{
-        httpOnly : true,
-        secure : true
-    })
-    .json(newUser)  
+    .cookie('token', `Bearer ${token}`)
+    .json({user:{
+        name: userData.name,
+        email: userData.email,
+        avatar_url: userData?.avatar_url,
+        cover_url: userData?.cover_url
+    }
+    })  
     } catch (err) {
         return res.status(409).json({"error":err.message})
     }
@@ -39,7 +46,7 @@ router.post('/login', validateLoginData, async(req,res)=>{
 
     const userData = await user.findOne({email})
 
-    if(!userData){ return res.status(400).json({"error":"Invalid"}) }
+    if(!userData){ return res.status(400).json({"error":"Invalid User"}) }
 
     const result = await verifyPass(password, userData.password)
 

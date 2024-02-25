@@ -19,7 +19,7 @@ const validateRegisterData = [
     body('password')
     .exists()
     .isLength({min:8})
-    .matches(passwordRegex).withMessage("Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, one digit, and one special character"),
+    .matches(passwordRegex).withMessage(    ),
     (req,res,next) => {
         const errors = validationResult(req)
         if(!errors.isEmpty()){

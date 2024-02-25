@@ -16,7 +16,7 @@ connectToDb()
     })
   }
   else{
-    console.log('Error:: While Connected to Database');
+    console.log('error:: While Connected to Database');
   }  
 })
 

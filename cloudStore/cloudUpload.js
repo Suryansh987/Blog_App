@@ -63,7 +63,6 @@ const deleteImage = async(public_id) => {
     try {
         const delete_status = await cloudinary.api.delete_resources([public_id], 
         { type: 'upload', resource_type: 'image' })
-        console.log(delete_status);
         return delete_status
     } catch (error) {
         return res.status(400).json({error:error.message})

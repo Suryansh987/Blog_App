@@ -25,7 +25,6 @@ const validateRegisterData = [
         if(!errors.isEmpty()){
             const regErrors=errors.array()
             const error = regErrors.reduce((error,value)=>{
-                console.log(value.path);
                 error[value.path] = value.msg
                 return error
             },{})
@@ -49,7 +48,6 @@ const validateLoginData = [
         if(!errors.isEmpty()){
             const loginErrors=errors.array()
             const error = loginErrors.reduce((error,value)=>{
-                console.log(value.path);
                 error[value.path] = value.msg
                 return error
             },{})
@@ -70,7 +68,6 @@ const validateBlogData = [
         if(!errors.isEmpty()){
             const blogErrors=errors.array()
             const error = blogErrors.reduce((error,value)=>{
-                console.log(value.path);
                 error[value.path] = value.msg
                 return error
             },{})

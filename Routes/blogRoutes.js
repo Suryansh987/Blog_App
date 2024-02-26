@@ -17,11 +17,11 @@ router.post('/addblog', fetchUser, uploadFiles, validateBlogData, async (req, re
     res.send(newblog)
 })
 
-router.get('/fetch', fetchUser, async (req, res) => {
+router.get('/userblogs', fetchUser, async (req, res) => {
     const user_id = req.user._id;
     try {
-        const userBlogs = await blog.find({ user: user_id });
-        res.status(200).json(userBlogs);
+        const userBlogs = await blog.find({ user: user_id }).select('title description thumbnail_url user');
+        res.status(200).json({blogs:userBlogs});
     } catch (error) {
         return res.status(500).json({ "error": error.message })
     }
@@ -36,10 +36,10 @@ router.put('/updateblog/:id', fetchUser, uploadFiles, async (req, res) => {
     if (!blog_data) return res.status(409).json({ error: "Not a valid User" })
 
     const { title, description } = req.body
-    if (title !== blog_data.title) {
+    if ( title && title !== blog_data.title) {
         blog_data.title = title
     }
-    if (description !== blog_data.description) {
+    if ( description && description !== blog_data.description) {
         blog_data.description = description
     }
 

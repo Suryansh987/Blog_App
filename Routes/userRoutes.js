@@ -7,8 +7,10 @@ import createJWT from "../controller/jwt.controller.js";
 import verifyPass from "../controller/pass.controller.js";
 import {validateRegisterData, validateLoginData} from "../middlewares/validate.js";
 import fetchUser from "../middlewares/fetchUser.js";
+import { header } from "express-validator";
 
 const router = Router()
+const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
 //ROUTE : FOR USER SIGNUP with NAME, EMAIL, PASS, AVATAR,COVERIMAGE(POST)
 router.post('/signin', validateRegisterData, hashPass, async (req, res) => {
@@ -28,10 +30,10 @@ router.post('/signin', validateRegisterData, hashPass, async (req, res) => {
     .status(200)
     .cookie('token', `Bearer ${token}`)
     .json({user:{
-        name: userData.name,
-        email: userData.email,
-        avatar_url: userData?.avatar_url,
-        cover_url: userData?.cover_url
+        name: newUser.name,
+        email: newUser.email,
+        avatar_url: newUser?.avatar_url,
+        cover_url: newUser?.cover_url
     }
     })  
     } catch (err) {
@@ -51,14 +53,14 @@ router.post('/login', validateLoginData, async(req,res)=>{
     const result = await verifyPass(password, userData.password)
 
     if(!result){
-        res.status(401).json({"error":"Invalid Credentials"})
+        return res.status(401).json({"error":"Invalid Credentials"})
     }
 
     const token = createJWT(userData)
 
     res
     .status(200)
-    .cookie('token', `Bearer ${token}`)
+    .cookie('token', `Bearer ${token}`,  { expires })
     .json({user:{
         name: userData.name,
         email: userData.email,
@@ -82,9 +84,6 @@ router.put('/updateUser', fetchUser, uploadFiles, async(req,res)=>{
      if( user_data.name!==name ){
          user_data.name = name
      }
-     else{
-        console.log("notChanged");
-     }
  
      const avatar = req?.files?.avatar
      const cover = req?.files?.cover
@@ -105,7 +104,6 @@ router.put('/updateUser', fetchUser, uploadFiles, async(req,res)=>{
      ]
  
      const [ avatar_data, cover_data, avatar_del_status, cover_del_status ] = await Promise.all([ avatarPromise, coverPromise, avatarDelete, coverDelete ])
-     console.log(avatar_data, cover_data, avatar_del_status, cover_del_status);
      if(avatar_data){
              const { avatar_url,avatar_id } = avatar_data
              user_data.avatar_url = avatar_url
@@ -124,5 +122,24 @@ router.put('/updateUser', fetchUser, uploadFiles, async(req,res)=>{
 
 })
 
+router.post('/loguser',fetchUser, async(req,res)=>{
+    if(res.headersSent) return
+
+    try {
+        const userId = req.user._id
+        const userData = await user.findById(userId).select('_id name email avatar_url cover_url')
+        if(userData){
+            res.status(200).json({
+                user: userData
+            })
+        }
+        else{
+            res.status(400).json({"error":"User not found"})
+        }
+        
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+})
 
 export default router

@@ -10,6 +10,9 @@ const blogSchema = new Schema({
         type : String,
         required : true
     },
+    tag : {
+        type : String,
+    },
     thumbnail_url : {
         type : String,
     },

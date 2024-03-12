@@ -16,7 +16,7 @@ const uploadFiles = (req,res,next) =>{
         }
     ])(req,res, (err) =>{
         if(err){
-            res.status(400).send({"MULTER":err.message})
+            return res.status(400).send({"MULTER":err.message})
         }
         next()
     })

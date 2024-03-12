@@ -59,7 +59,6 @@ const validateLoginData = [
 
 const validateBlogData = [
     body('title')
-    .escape()
     .exists().withMessage("Title is Required"),
     body('description')
     .exists().withMessage("Description is Required"),

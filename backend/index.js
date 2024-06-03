@@ -43,11 +43,7 @@ connectToDb()
 })
 
 app.use(cors({
-  origin: ['https://techyblogs.vercel.app',
-  'https://techyblogs-3fyo4p3rm-techyblogs.vercel.app',
-  'https://techyblogs-techyblogs.vercel.app',
-  'https://techyblogs.vercel.app/'
-  ],
+  origin: '*',
   credentials: true,
 }));
 app.use(express.json())

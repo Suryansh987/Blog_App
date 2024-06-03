@@ -14,7 +14,7 @@ const router = Router()
  * /api/v1/blog/addblog:
  *   post:
  *     summary: Add a new blog
- *     description: Add a new blog post with title, description, and optional tag.
+ *     description: Add a new blog post with title, description, and thumbnail.
  *     security:
  *       - BearerAuth: []
  *     requestBody:

@@ -224,7 +224,7 @@ router.put('/updateUser', fetchUser, uploadFiles, async(req,res)=>{
  * /api/v1/user/loguser:
  *   post:
  *     summary: Log user
- *     description: Get logged-in user's data.
+ *     description: Get logged-in user's data from Cookies.
  *     security:
  *       - BearerAuth: []
  *     responses:

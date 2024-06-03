@@ -28,3 +28,6 @@ const blogSchema = new Schema({
 },{timestamps : true})
 
 export const blog = db.model("Blog", blogSchema , "UserBlogs")
+
+
+

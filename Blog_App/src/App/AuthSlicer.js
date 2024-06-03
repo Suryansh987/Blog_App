@@ -7,8 +7,6 @@ const initialState = {
 };
     
 
-
-
 const AuthSlicer = createSlice({
     name: "Auth",
     initialState,

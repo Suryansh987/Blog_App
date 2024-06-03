@@ -11,6 +11,10 @@ import swaggerJSDoc from 'swagger-jsdoc';
 const app = express()
 const port = 3000
 
+app.use(cors({
+  origin: '*',
+  credentials: true,
+}));
 const swaggerOptions = {
   swaggerDefinition: {
     openapi: '3.0.0',
@@ -42,10 +46,6 @@ connectToDb()
   }  
 })
 
-app.use(cors({
-  origin: '*',
-  credentials: true,
-}));
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cookieParser())

@@ -60,7 +60,7 @@ router.post('/signin', validateRegisterData, hashPass, async (req, res) => {
         const token = createJWT(newUser)
         res
     .status(200)
-    .cookie('token', `Bearer ${token}`)
+    .cookie('token', `Bearer ${token}` ,  { expires, secure: true, httpOnly: true })
     .json({user:{
         name: newUser.name,
         email: newUser.email,
@@ -122,7 +122,7 @@ router.post('/login', validateLoginData, async(req,res)=>{
 
     res
     .status(200)
-    .cookie('token', `Bearer ${token}`,  { expires })
+    .cookie('token', `Bearer ${token}`,  { expires, secure: true, httpOnly: true })
     .json({user:{
         name: userData.name,
         email: userData.email,

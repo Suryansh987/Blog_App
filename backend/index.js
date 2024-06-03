@@ -1,7 +1,7 @@
 import express from 'express'
-import userRoute from "../Routes/userRoutes.js"
-import connectToDb from '../db/db.js'
-import blogRoute from '../Routes/blogRoutes.js'
+import userRoute from "./Routes/userRoutes.js"
+import connectToDb from './db/db.js'
+import blogRoute from './Routes/blogRoutes.js'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 
@@ -43,12 +43,15 @@ connectToDb()
 })
 
 app.use(cors({
-  origin: 'http://127.0.0.1:5173',
+  origin: '*',
   credentials: true,
 }));
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(cookieParser())
+app.get('/',(req,res) => {
+  res.send("Helllo")
+})
 app.use('/api/v1/user', userRoute)
 app.use('/api/v1/blog', blogRoute)
 

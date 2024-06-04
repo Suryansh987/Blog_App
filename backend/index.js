@@ -12,9 +12,7 @@ const app = express()
 const port = 3000
 
 app.use(cors({
-  origin: function(origin, callback){
-    return callback(null, true);
-  },
+  origin: 'https://techyblogs.vercel.app',
   credentials: true,
 }));
 const swaggerOptions = {

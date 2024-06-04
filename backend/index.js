@@ -12,9 +12,14 @@ const app = express()
 const port = 3000
 
 app.use(cors({
-  origin: 'https://techyblogs.vercel.app',
+  origin: 'https://techyblogs.vercel.app/',
   credentials: true,
 }));
+
+app.use(function(req, res, next) {
+  console.log('CORS headers:', res.getHeaders()['access-control-allow-origin']);
+  next();
+});
 const swaggerOptions = {
   swaggerDefinition: {
     openapi: '3.0.0',

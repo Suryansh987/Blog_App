@@ -12,7 +12,7 @@ const app = express()
 const port = 3000
 
 app.use(cors({
-  origin: 'https://techyblogs.vercel.app/',
+  origin: 'http://127.0.0.1:5173',
   credentials: true,
 }));
 
@@ -57,8 +57,11 @@ app.use(cookieParser())
 app.get('/',(req,res) => {
   res.send("Helllo")
 })
+
+
 app.use('/api/v1/user', userRoute)
 app.use('/api/v1/blog', blogRoute)
+
 
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs))
 

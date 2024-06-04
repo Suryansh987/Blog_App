@@ -1,0 +1,15 @@
+{
+  "name": "blog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+"start":"cd backend && npm start",
+"prebuild":"cd backend && npm i  && cd ../Blog_App && npm i",
+"build":"cd Blog_App && npm run build",
+"postbuild":"mv -f Blog_App/dist backend/src/public"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

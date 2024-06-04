@@ -12,7 +12,9 @@ const app = express()
 const port = 3000
 
 app.use(cors({
-  origin: '*',
+  origin: function(origin, callback){
+    return callback(null, true);
+  },
   credentials: true,
 }));
 const swaggerOptions = {
